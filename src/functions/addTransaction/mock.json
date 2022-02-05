@@ -1,0 +1,6 @@
+{
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"from\": \"Tu\", \"to\": \"Thanh\", \"amount\": 100}"
+}

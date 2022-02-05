@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@functions": ["src/functions"],
+      "@functions/*": ["src/functions/*"],
+      "@tables": ["src/tables"],
+      "@libs/*": ["src/libs/*"],
+      "@cognito": ["src/cognito"],
+    }
+  }
+}
