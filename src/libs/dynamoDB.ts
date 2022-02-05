@@ -1,6 +1,6 @@
 import {DynamoDB} from 'aws-sdk';
 import {nanoid} from 'nanoid';
-import {PutItemOutput} from 'aws-sdk/clients/dynamodb';
+import {BatchWriteItemInput, BatchWriteItemOutput, PutItemOutput} from 'aws-sdk/clients/dynamodb';
 
 const { STAGE } = process.env;
 
@@ -17,10 +17,25 @@ type BaseItem = {
 } & NewItem;
 
 
-export const putItem = async <T extends NewItem>(tableName: string, item: T): Promise<PutItemOutput> => {
-  const params = preparePutItemStatement(getTableName(tableName), item);
+export const putItem = async <T extends NewItem>(tableName: string, item: T, condition = 'attribute_not_exists(id)'): Promise<PutItemOutput> => {
+  const params = preparePutItemStatement(getTableName(tableName), item, condition);
   console.log(JSON.stringify(params, null, 2));
   return await dbClient.putItem(params).promise();
+};
+
+export const batchPutItems = async <T extends NewItem>(
+  tableName: string,
+  items: T[]
+): Promise<BatchWriteItemOutput> => {
+  const params = {
+    RequestItems: {
+      [getTableName(tableName)]: items.map((item) => ({
+        PutRequest: {Item: DynamoDB.Converter.marshall({...item, id: nanoid()}) },
+      })),
+    },
+  } as BatchWriteItemInput;
+  console.log(JSON.stringify(params, null, 2));
+  return await dbClient.batchWriteItem(params).promise();
 };
 
 export const updateItem = async <T extends BaseItem>(tableName: string, item: T) => {
@@ -36,7 +51,7 @@ export const updateItem = async <T extends BaseItem>(tableName: string, item: T)
 
 const getTableName = (tableName: string) => `${STAGE}-${tableName}`;
 
-const preparePutItemStatement = (tableName: string, item: NewItem) => {
+const preparePutItemStatement = (tableName: string, item: NewItem, condition = 'attribute_not_exists(id)') => {
   const nowIso = new Date().toISOString();
   item.id = item.id || nanoid();
   item.createdAt = item.createdAt || nowIso;
@@ -44,7 +59,7 @@ const preparePutItemStatement = (tableName: string, item: NewItem) => {
   const params = {
     Item: DynamoDB.Converter.marshall(item),
     TableName: tableName,
-    ConditionExpression: 'attribute_not_exists(id)',
+    ConditionExpression: condition,
   };
   return params;
 };

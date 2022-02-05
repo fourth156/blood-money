@@ -2,5 +2,5 @@
   "headers": {
     "Content-Type": "application/json"
   },
-  "body": "{\"from\": \"Tu\", \"to\": \"Thanh\", \"amount\": 100}"
+  "body": "{\"transactions\": [{\"from\": \"Tu\", \"to\": \"Thanh\", \"amount\": 100, \"refId\": \"123\"},  {\"from\": \"Tu\", \"to\": \"Nhan\", \"amount\": 200, \"refId\": \"123\"},{\"from\": \"Tu\", \"to\": \"Hieu\", \"amount\": 300, \"refId\": \"123\"}]}"
 }

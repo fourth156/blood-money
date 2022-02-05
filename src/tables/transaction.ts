@@ -8,6 +8,7 @@ export default {
       defineAttribute('id', 'S'),
       defineAttribute('from', 'S'),
       defineAttribute('to', 'S'),
+      defineAttribute('refId', 'S'),
     ],
     KeySchema: [defineKeySchema('id', 'HASH')],
     GlobalSecondaryIndexes: [
@@ -25,6 +26,17 @@ export default {
       {
         IndexName: 'to-index',
         KeySchema: [defineKeySchema('to', 'HASH')],
+        Projection: {
+          ProjectionType: 'ALL',
+        },
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 1,
+          WriteCapacityUnits: 1,
+        },
+      },
+      {
+        IndexName: 'refId-index',
+        KeySchema: [defineKeySchema('refId', 'HASH')],
         Projection: {
           ProjectionType: 'ALL',
         },
