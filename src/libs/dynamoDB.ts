@@ -1,6 +1,7 @@
 import {DynamoDB} from 'aws-sdk';
 import {nanoid} from 'nanoid';
 import {BatchWriteItemInput, BatchWriteItemOutput, PutItemOutput} from 'aws-sdk/clients/dynamodb';
+import { Query } from 'src/tables/type';
 
 const { STAGE } = process.env;
 
@@ -49,7 +50,41 @@ export const updateItem = async <T extends BaseItem>(tableName: string, item: T)
   }
 }
 
+export const queryItems = async (tableName: string, query: Query) => {
+  try {
+    const { index, indexValue } = query;
+    const params = prepareQueryStatement(tableName, index, indexValue);
+    console.log(JSON.stringify(params, null, 2));
+    const result = await dbClient.query(params).promise();
+    const items = result.Items.map(item => DynamoDB.Converter.unmarshall(item));
+    return items;
+  }
+  catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 const getTableName = (tableName: string) => `${STAGE}-${tableName}`;
+const getIndexName = (indexName: string) => `${indexName}-index`;
+
+const prepareQueryStatement = (tableName: string, index: string, indexValue: any) => {
+  const TableName = getTableName(tableName);
+  const IndexName = getIndexName(index);
+  const params = {
+    KeyConditionExpression: `#${index} = :${index}`,
+    ExpressionAttributeValues: {
+      [`:${index}`]: DynamoDB.Converter.marshall({ [index]: indexValue })[index],
+    },
+    ExpressionAttributeNames: {
+      [`#${index}`]: index,
+    },
+    IndexName,
+    TableName,
+  };
+
+  return params;
+};
 
 const preparePutItemStatement = (tableName: string, item: NewItem, condition = 'attribute_not_exists(id)') => {
   const nowIso = new Date().toISOString();

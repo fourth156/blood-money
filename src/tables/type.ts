@@ -60,3 +60,8 @@ export const defineKeySchema = (
   AttributeName: name,
   KeyType: type,
 });
+
+export type Query = {
+  index: string;
+  indexValue: string | number;
+}

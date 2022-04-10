@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { addTransaction } from '@functions';
+import { addTransaction, queryTransaction } from '@functions';
 import tables from '@tables';
 import cognito from '@cognito';
 
@@ -27,7 +27,7 @@ export const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: {addTransaction},
+  functions: {addTransaction, queryTransaction},
   resources: {
     Resources: {
       ...cognito,
