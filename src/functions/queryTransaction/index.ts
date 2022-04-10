@@ -8,7 +8,7 @@ export default {
     {
       http: {
         method: 'post',
-        path: 'transaction',
+        path: 'transaction/query',
         request: {
           schemas: {
             'application/json': schema
