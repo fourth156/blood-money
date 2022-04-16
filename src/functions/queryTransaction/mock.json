@@ -2,5 +2,5 @@
   "headers": {
     "Content-Type": "application/json"
   },
-  "body": "{\"query\":{\"index\":\"to\",\"indexValue\":\"Thanh\"}}"
+  "body": "{\"query\":{\"index\":\"ALL\",\"indexValue\":\"ALL\"}}"
 }

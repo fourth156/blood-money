@@ -13,8 +13,8 @@ export const serverlessConfiguration: AWS = {
     runtime: 'nodejs14.x',
     region: 'ap-southeast-1',
     apiGateway: {
-      minimumCompressionSize: 1024,
-      shouldStartNameWithService: true,
+      minimumCompressionSize: 256,
+      shouldStartNameWithService: true
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',

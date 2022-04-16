@@ -14,6 +14,14 @@ export default {
             'application/json': schema
           }
         },
+        cors: true
+      }
+    },
+    {
+      http: {
+        method: 'options',
+        path: 'transaction/add',
+        cors: true
       }
     }
   ],

@@ -54,7 +54,6 @@ export const queryItems = async (tableName: string, query: Query) => {
   try {
     const { index, indexValue } = query;
     const params = prepareQueryStatement(tableName, index, indexValue);
-    console.log(JSON.stringify(params, null, 2));
     const result = await dbClient.query(params).promise();
     const items = result.Items.map(item => DynamoDB.Converter.unmarshall(item));
     return items;
@@ -65,11 +64,33 @@ export const queryItems = async (tableName: string, query: Query) => {
   }
 }
 
+export const scanTable = async (tableName: string) => {
+  try {
+    const result = await dbClient.scan({ TableName: getTableName(tableName) }).promise();
+    const items = result.Items.map(item => DynamoDB.Converter.unmarshall(item));
+    console.log(items);
+    return items;
+  } catch (error) { 
+    console.error(error);
+    throw error;
+  }
+}
+
 const getTableName = (tableName: string) => `${STAGE}-${tableName}`;
 const getIndexName = (indexName: string) => `${indexName}-index`;
 
 const prepareQueryStatement = (tableName: string, index: string, indexValue: any) => {
   const TableName = getTableName(tableName);
+
+  if (index === "id") {
+    return {
+      TableName,
+      KeyConditionExpression: "id = :id",
+      ExpressionAttributeValues: {
+        ":id": DynamoDB.Converter.marshall({ [index]: indexValue })[index],
+      },
+    };
+  }
   const IndexName = getIndexName(index);
   const params = {
     KeyConditionExpression: `#${index} = :${index}`,
