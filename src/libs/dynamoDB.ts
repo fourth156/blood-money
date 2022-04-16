@@ -28,10 +28,16 @@ export const batchPutItems = async <T extends NewItem>(
   tableName: string,
   items: T[]
 ): Promise<BatchWriteItemOutput> => {
+  const nowIso = new Date().toISOString()
   const params = {
     RequestItems: {
       [getTableName(tableName)]: items.map((item) => ({
-        PutRequest: {Item: DynamoDB.Converter.marshall({...item, id: nanoid()}) },
+        PutRequest: {Item: DynamoDB.Converter.marshall({
+          ...item, 
+          id: nanoid(), 
+          createdAt: nowIso,
+          updatedAt: nowIso
+        }) },
       })),
     },
   } as BatchWriteItemInput;
@@ -109,9 +115,10 @@ const prepareQueryStatement = (tableName: string, index: string, indexValue: any
 
 const preparePutItemStatement = (tableName: string, item: NewItem, condition = 'attribute_not_exists(id)') => {
   const nowIso = new Date().toISOString();
-  item.id = item.id || nanoid();
-  item.createdAt = item.createdAt || nowIso;
-  item.updatedAt = item.updatedAt || nowIso;
+  item.id = item.id ?? nanoid();
+  item.createdAt = item.createdAt ?? nowIso;
+  item.updatedAt = item.updatedAt ?? nowIso;
+  console.log(JSON.stringify(item, null, 2))
   const params = {
     Item: DynamoDB.Converter.marshall(item),
     TableName: tableName,
@@ -122,7 +129,7 @@ const preparePutItemStatement = (tableName: string, item: NewItem, condition = '
 
 const prepareUpdateItemStatement = (tableName: string, item: BaseItem) => {
   const nowIso = (new Date()).toISOString();
-  item.updatedAt = item.updatedAt || nowIso;
+  item.updatedAt = item.updatedAt ?? nowIso;
 
   let expNames = {};
   let expValues = {};
